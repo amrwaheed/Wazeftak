@@ -67,32 +67,6 @@ class EducationController extends Controller
 
 
 
- /*   // univerity
-    public function university(Request $request)
-    {
-        if ($request->isMethod('POST')) {
-            $this->validate($request, [
-                'degreelevel' => 'required|',
-                'university' => 'required|max:55',
-                'Field' => 'required',
-                'yeargraduation' => 'required',
-                'grade' => 'required',
-
-            ]);
-            $universtiy = new UniversityInformation();
-            $universtiy->degree_id = $request->input('degreelevel');
-            $universtiy->university_name = $request->input('university');
-            $universtiy->fields_study = $request->input('Field');
-            $universtiy->endyear = $request->input('yeargraduation');
-            $universtiy->grade_id = $request->input('grade');
-            $universtiy->user_id = auth()->user()->id;
-            $universtiy->save();
-            // Return user back and show a flash message
-            return redirect()->route('users/education')->with(['status' => 'Data created successfully.']);
-
-        }
-    }*/
-
 
     /**
      * Display the specified resource.
@@ -102,7 +76,24 @@ class EducationController extends Controller
      */
     public function show($id)
     {
-        //
+        $schools = DB::table('schools')
+            ->join('users','schools.user_id' , 'users.id')
+            ->where('user_id',$id)
+            ->get()->first();
+        $universities = DB::table('universities')
+            ->join('degrees','universities.degree_id' , 'degrees.id')
+            ->join('grades','universities.grade_id' , 'grades.id')
+            ->join('users','universities.user_id' , 'users.id')
+            ->where('user_id',$id)
+            ->get()->first();
+
+        $courses = DB::table('courses')
+
+            ->join('users','courses.user_id' , 'users.id')
+            ->where('user_id',$id)
+            ->get();
+
+        return view('users/edit/education' ,compact('schools' , 'universities','courses'));
     }
 
     /**
@@ -113,7 +104,13 @@ class EducationController extends Controller
      */
     public function edit($id)
     {
-        //
+        $schools = DB::table('schools')
+            ->join('users','schools.user_id' , 'users.id')
+            ->where('user_id',$id)
+            ->get()->first();
+
+       // dd($schools);
+        return view('users/edit/school' ,compact('schools'));
     }
 
     /**
@@ -125,7 +122,23 @@ class EducationController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        if ($request->isMethod('PUT')) {
+            $this->validate($request, [
+                'schoolname' => 'required|max:50',
+                'yeargraduation' => 'required',
+
+            ]);
+            $school =  EducationInformation::find($id);
+            $school->high_school = $request->input('schoolname');
+            $school->gradatesyear = $request->input('yeargraduation');
+
+            $school->save();
+            // Return user back and show a flash message
+            return redirect()->back()->with(['status' => 'Data Updated successfully.']);
+
+
+
+        }
     }
 
     /**

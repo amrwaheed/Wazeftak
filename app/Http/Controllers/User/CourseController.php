@@ -84,7 +84,14 @@ class CourseController extends Controller
      */
     public function edit($id)
     {
-        //
+        $degrees = DB::table('degrees')->get();
+        $grades = DB::table('grades')->get();
+        $courses = DB::table('courses')
+            //->join('users','courses.user_id' , 'users.id')
+            ->where('user_id',$id)
+            ->get()->first();
+        //dd($courses);
+        return view('users/edit/courses' ,compact('courses','degrees','grades'));
     }
 
     /**
@@ -96,7 +103,26 @@ class CourseController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        if ($request->isMethod('PUT')) {
+            $this->validate($request, [
+                'training_courses' => 'required|max:50',
+                'Organization_Institution' => 'required|max:100',
+                'date_start_course' => 'required|',
+                'date_end_course' => 'required|',
+
+            ]);
+            $coures =  CourseInformation::find($id);
+            $coures->course_name = $request->input('training_courses');
+            $coures->organization_name = $request->input('Organization_Institution');
+            $coures->start_date = $request->input('date_start_course');
+            $coures->end_date = $request->input('date_end_course');
+
+            $coures->save();
+            // Return user back and show a flash message
+           return redirect()->back()->with(['status' => 'Data Updated successfully.']);
+  ;
+
+        }
     }
 
     /**

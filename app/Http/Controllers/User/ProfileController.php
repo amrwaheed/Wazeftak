@@ -66,6 +66,8 @@ class ProfileController extends Controller
             ->where('user_id',auth()->user()->id)
             ->get()->first();
 
+
+
         $languages_lists = DB::table('languages_lists')
             ->join('languages','languages_lists.language_id' , 'languages.id')
             ->join('language_levels','languages_lists.language_level_id' , 'language_levels.id')
@@ -77,10 +79,10 @@ class ProfileController extends Controller
         $experiences = DB::table('experiences')
             ->join('users','experiences.user_id' , 'users.id')
             ->where('user_id',auth()->user()->id)
-            ->orderBy('id' ,'desc')
+            ->orderBy('date_end' ,'desc')
             ->get();
 
-
+      //  dd($experiences);
         $courses = DB::table('courses')
 
             ->join('users','courses.user_id' , 'users.id')

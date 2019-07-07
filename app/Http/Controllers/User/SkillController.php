@@ -68,7 +68,19 @@ class SkillController extends Controller
      */
     public function show($id)
     {
-        //
+
+        $skills = DB::table('skills')
+            //->join('users','skills.user_id' , 'users.id')
+            ->where('user_id',$id)
+            ->get();
+        $languages_lists = DB::table('languages_lists')
+            ->join('languages','languages_lists.language_id' , 'languages.id')
+            ->join('language_levels','languages_lists.language_level_id' , 'language_levels.id')
+           // ->join('users','languages_lists.user_id' , 'users.id')
+            ->where('user_id',$id)
+            ->get();
+    //dd($skills);
+        return view('users/edit/skills' ,compact('skills' , 'languages_lists'));
     }
 
     /**
@@ -79,7 +91,13 @@ class SkillController extends Controller
      */
     public function edit($id)
     {
-        //
+        $skills = DB::table('skills')
+            //->join('users','skills.user_id' , 'users.id')
+            ->where('user_id',$id)
+            ->get()->first();
+//dd($skills);
+        return view('users/edit/editskill' ,compact('skills'));
+
     }
 
     /**
@@ -91,7 +109,20 @@ class SkillController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        if ($request->isMethod('PUT')) {
+            $this->validate($request, [
+                'skillname' => 'required|max:50',
+
+
+            ]);
+            $skills =  SkillInformation::find($id);
+            $skills->skill_name = $request->input('skillname');
+
+            $skills->save();
+            // Return user back and show a flash message
+            return redirect()->back()->with(['status' => 'Data Updated successfully.']);
+
+        }
     }
 
     /**

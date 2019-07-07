@@ -85,7 +85,16 @@ class UniversityController extends Controller
      */
     public function edit($id)
     {
-        //
+        $degrees = DB::table('degrees')->get();
+        $grades = DB::table('grades')->get();
+        $universities = DB::table('universities')
+            ->join('degrees','universities.degree_id' , 'degrees.id')
+            ->join('grades','universities.grade_id' , 'grades.id')
+           // ->join('users','universities.user_id' , 'users.id')
+            ->where('user_id',$id)
+            ->get()->first();
+        //dd($universities);
+        return view('users/edit/university' ,compact('universities','degrees','grades'));
     }
 
     /**
@@ -97,7 +106,27 @@ class UniversityController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        if ($request->isMethod('PUT')) {
+            $this->validate($request, [
+                'degreelevel' => 'required|',
+                'university' => 'required|max:55',
+                'Field' => 'required',
+                'yeargraduation' => 'required',
+                'grade' => 'required',
+
+            ]);
+            $universtiy =  UniversityInformation::find($id);
+            $universtiy->degree_id = $request->input('degreelevel');
+            $universtiy->university_name = $request->input('university');
+            $universtiy->fields_study = $request->input('Field');
+            $universtiy->endyear = $request->input('yeargraduation');
+            $universtiy->grade_id = $request->input('grade');
+
+            $universtiy->save();
+            // Return user back and show a flash message
+            return redirect()->back()->with(['status' => 'Data Updated successfully.']);
+
+        }
     }
 
     /**

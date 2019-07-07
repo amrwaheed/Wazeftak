@@ -82,7 +82,16 @@ class LanguagelistController extends Controller
      */
     public function edit($id)
     {
-        //
+        $languages = DB::table('languages')->get();
+        $languages_level = DB::table('language_levels')->get();
+        $languages_lists = DB::table('languages_lists')
+            ->join('languages','languages_lists.language_id' , 'languages.id')
+            ->join('language_levels','languages_lists.language_level_id' , 'language_levels.id')
+            // ->join('users','languages_lists.user_id' , 'users.id')
+            ->where('user_id',$id)
+            ->get()->first();
+      //  dd($languages_lists);
+        return view('users/edit/editlanguage' ,compact( 'languages_lists','languages','languages_level'));
     }
 
     /**
@@ -94,7 +103,23 @@ class LanguagelistController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        if ($request->isMethod('PUT')) {
+            $this->validate($request, [
+                'lang_name' => 'required',
+                'lang_exper' => 'required',
+
+
+            ]);
+            $lang =  Level_LanguageInformation::find($id);
+            $lang->language_id = $request->input('lang_name');
+            $lang->language_level_id = $request->input('lang_exper');
+
+            $lang->save();
+            // Return user back and show a flash message
+            return redirect()->back()->with(['status' => 'Data Updated successfully.']);
+
+        }
+
     }
 
     /**
